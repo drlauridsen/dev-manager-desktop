@@ -2,7 +2,7 @@ import {Component, Host, Input, OnDestroy, ChangeDetectionStrategy} from '@angul
 import {AppsComponent} from '../apps.component';
 import {Device, PackageInfo} from "../../types";
 import {Observable, Subscription} from "rxjs";
-import {AppsRepoService, RepositoryItem} from "../../core/services";
+import {AppsRepoService, CustomAppsService, RepositoryItem} from "../../core/services";
 
 @Component({
     selector: 'app-installed',
@@ -23,7 +23,8 @@ export class InstalledComponent implements OnDestroy {
     private subscription?: Subscription;
     private installedField?: Observable<PackageInfo[] | null>;
 
-    constructor(@Host() public parent: AppsComponent, private appsRepo: AppsRepoService) {
+    constructor(@Host() public parent: AppsComponent, private appsRepo: AppsRepoService,
+                private customApps: CustomAppsService) {
     }
 
     @Input()
@@ -34,7 +35,9 @@ export class InstalledComponent implements OnDestroy {
                 this.installedError = undefined;
 
                 const strings: string[] = pkgs?.map((pkg) => pkg.id) ?? [];
-                this.appsRepo.showApps(...strings).then(apps => this.repoPackages = apps);
+                // A description file in the custom apps folder wins over the repository entry.
+                Promise.all([this.appsRepo.showApps(...strings), this.customApps.loadMap()])
+                    .then(([apps, custom]) => this.repoPackages = {...apps, ...custom});
             },
             error: (error) => {
                 console.log('installed apps', error);

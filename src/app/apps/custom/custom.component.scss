@@ -1,0 +1,27 @@
+.app-item {
+  cursor: pointer;
+}
+
+.app-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.app-title {
+  font-weight: bold;
+}
+
+.app-desc {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+::ng-deep .custom-help pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 0.5rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.25rem;
+}

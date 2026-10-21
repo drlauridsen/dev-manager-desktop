@@ -178,6 +178,14 @@ export class AppsComponent implements OnInit, OnDestroy {
                 });
                 return false;
             }
+            if (!manifest.ipkUrl) {
+                MessageDialogComponent.open(this.modalService, {
+                    title: `Cannot install ${item.title}`,
+                    message: `The description file has no "ipkUrl". Install the .ipk file with the Install button instead.`,
+                    positive: 'Close',
+                });
+                return false;
+            }
             const component = progress.componentInstance as ProgressDialogComponent;
             await this.appManager.installByManifest(device, manifest,
                 (progress, statusText) => component.update(statusText, progress));

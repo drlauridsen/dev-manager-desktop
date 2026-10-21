@@ -5,6 +5,7 @@ import {AppsRoutingModule} from './apps-routing.module';
 import {AppsComponent} from "./apps.component";
 import {ChannelComponent} from "./channel/channel.component";
 import {InstalledComponent} from "./installed/installed.component";
+import {CustomComponent} from "./custom/custom.component";
 import {NgbDropdownModule, NgbNavModule, NgbPaginationModule, NgbProgressbar} from "@ng-bootstrap/ng-bootstrap";
 import {SharedModule} from "../shared/shared.module";
 import {HbchannelRemoveComponent} from './hbchannel-remove/hbchannel-remove.component';
@@ -15,6 +16,7 @@ import {FormsModule} from "@angular/forms";
         AppsComponent,
         InstalledComponent,
         ChannelComponent,
+        CustomComponent,
         HbchannelRemoveComponent,
     ],
     imports: [

@@ -16,6 +16,14 @@ import {fromPromise} from "rxjs/internal/observable/innerFrom";
 import {AppsComponent} from "../apps.component";
 import {ExternalLinkDirective} from "../../shared/directives";
 
+function plainTextToHtml(text?: string): string {
+    if (!text) return '';
+    const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text.split(/\n{2,}/)
+        .map(paragraph => `<p>${escape(paragraph).replace(/\n/g, '<br>')}</p>`)
+        .join('');
+}
+
 @Component({
     selector: 'app-channel-app-details',
     imports: [
@@ -58,7 +66,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         this.manifest = item.manifest!;
         this.incompatible$ = fromPromise(this.appManager.checkIncompatibility(device, item));
         this.fullDescriptionHtml$ = item.fullDescriptionUrl ? fromPromise(fetch(item.fullDescriptionUrl)
-            .then(resp => resp.text())) : of('');
+            .then(resp => resp.text())) : of(plainTextToHtml(item.fullDescription));
         this.reloadInstalledInfo();
     }
 

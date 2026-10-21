@@ -20,6 +20,12 @@
             <app-channel [installed]="instPackages"></app-channel>
           </ng-template>
         </li>
+        <li ngbNavItem="custom">
+          <a ngbNavLink>Custom</a>
+          <ng-template ngbNavContent>
+            <app-custom [installed]="instPackages"></app-custom>
+          </ng-template>
+        </li>
       </ul>
       <button class="btn btn-primary text-nowrap ms-auto" (click)="openInstallChooser()">
         <i class="bi bi-folder-fill me-2"></i>Install

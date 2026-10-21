@@ -89,6 +89,8 @@ export class RepositoryItem {
     requirements?: PackageRequirements;
     shortDescription?: string;
     fullDescriptionUrl?: string;
+    /** Plain text shown on the details page, for apps that have no `fullDescriptionUrl`. */
+    fullDescription?: string;
 
     constructor(data: Partial<RepositoryItem>, url: string) {
         Object.assign(this, data);

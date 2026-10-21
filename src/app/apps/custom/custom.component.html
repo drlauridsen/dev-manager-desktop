@@ -1,0 +1,122 @@
+<div class="d-flex flex-row align-items-center mb-3">
+  <div class="text-muted small text-break flex-fill">{{ dirPath }}</div>
+  <div class="btn-group ms-2 text-nowrap" role="group">
+    <button class="btn btn-sm btn-outline-secondary" (click)="openFolder()">
+      <i class="bi bi-folder2-open me-2"></i>Open folder
+    </button>
+    <button class="btn btn-sm btn-outline-secondary" (click)="reload()">
+      <i class="bi bi-arrow-clockwise me-2"></i>Reload
+    </button>
+    <button class="btn btn-sm btn-outline-secondary" (click)="openHelp()">
+      <i class="bi bi-question-circle me-2"></i>Help
+    </button>
+  </div>
+</div>
+
+@if (loadError) {
+  <app-error-card title="Unable to read the custom apps folder" [error]="loadError" (retry)="reload()">
+  </app-error-card>
+} @else if (result) {
+  @for (error of result.errors; track error) {
+    <div class="alert alert-warning py-2" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+    </div>
+  }
+  @if (result.items.length) {
+    <ul class="list-group list-group-flush">
+      @for (item of result.items; track item.id) {
+        <li class="list-group-item app-item d-flex flex-row align-items-center" (click)="parent.openDetails(item)">
+          <div class="app-desc flex-fill">
+            <img class="app-icon" [src]="item.iconUri" [alt]="item.title" width="48" height="48">
+            <div class="app-headline ms-3">
+              <div class="app-title">{{ item.title }}</div>
+              <div class="app-description">
+                <span>v{{ item.manifest?.version }}</span>
+                @if (installed?.[item.id]; as inst) {
+                  <span class="ms-2">Installed: v{{ inst.version }}</span>
+                  @if (item.manifest?.hasUpdate(inst.version)) {
+                    <span class="text-primary ms-2">Update available</span>
+                  }
+                } @else {
+                  <span class="ms-2">Not installed</span>
+                }
+                @if (item.manifest?.appDescription; as desc) {
+                  <span class="ms-2">&middot; {{ desc }}</span>
+                }
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-primary ms-2 text-nowrap" aria-label="Details">Details</button>
+        </li>
+      }
+    </ul>
+  } @else if (!result.errors.length) {
+    <div class="text-muted">
+      No custom apps yet. Put a .json file in the folder above, then press Reload. Press Help to see how.
+    </div>
+  }
+} @else {
+  <app-loading-card></app-loading-card>
+}
+
+<ng-template #help let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Custom apps</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Close click')"></button>
+  </div>
+  <div class="modal-body custom-help">
+    <p>
+      Apps that are not in the Homebrew repository can be listed here with a description file.
+      Dev Manager shows the details page, the version and an Uninstall button for them.
+      The same file also gives the app a details page in the Installed tab.
+    </p>
+
+    <h6>Where to put the files</h6>
+    <p>
+      In the folder <code>{{ dirName }}</code> inside the app data folder:
+    </p>
+    <pre class="user-select-all">{{ dirPath }}</pre>
+    <p>
+      Use <strong>Open folder</strong> to open it, or <strong>Reload</strong> after you have changed a file.
+      Each app has its own file, named <code>&lt;app id&gt;.json</code>, for example <code>com.example.myapp.json</code>.
+      Files that do not end in <code>.json</code> are ignored.
+    </p>
+
+    <h6>What the file contains</h6>
+    <table class="table table-sm">
+      <thead>
+        <tr><th>Field</th><th>Required</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Yes</td><td>The <code>id</code> from the app's <code>appinfo.json</code>. Used to find the installed app and to uninstall it.</td></tr>
+        <tr><td><code>title</code></td><td>Yes</td><td>Name shown in the list.</td></tr>
+        <tr><td><code>shortDescription</code></td><td>No</td><td>One line for the list.</td></tr>
+        <tr><td><code>fullDescription</code></td><td>No</td><td>Text for the details page. A blank line starts a new paragraph.</td></tr>
+        <tr><td><code>iconUri</code></td><td>No</td><td>An <code>https://</code> link to a PNG. Local paths do not work.</td></tr>
+        <tr><td><code>manifest.version</code></td><td>Yes</td><td>The version, for example <code>1.0.0</code>. Compared with the installed version to show updates.</td></tr>
+        <tr><td><code>manifest.appDescription</code></td><td>No</td><td>Defaults to <code>shortDescription</code>.</td></tr>
+        <tr><td><code>manifest.sourceUrl</code></td><td>No</td><td>An <code>https://</code> link shown as the project page.</td></tr>
+        <tr><td><code>manifest.ipkUrl</code></td><td>No</td><td>An <code>https://</code> link to the .ipk. Without it, install with the Install button.</td></tr>
+      </tbody>
+    </table>
+    <p>
+      There is no separate uninstall field. Uninstall removes the app with the <code>id</code> from the file.
+    </p>
+
+    <h6>Example</h6>
+    <pre class="user-select-all">{{ exampleJson }}</pre>
+
+    <h6>Let an AI write the file</h6>
+    <p>
+      Copy this text into an AI assistant, and add the contents of the app's <code>appinfo.json</code> below it.
+      Save the answer in the folder as <code>&lt;app id&gt;.json</code>.
+    </p>
+    <pre class="user-select-all">{{ aiPrompt }}</pre>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="copyPrompt()">
+      <i class="bi bi-clipboard me-2"></i>{{ copied ? 'Copied' : 'Copy AI instruction' }}
+    </button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('Close')">Close</button>
+  </div>
+</ng-template>
