@@ -178,15 +178,23 @@ export class AppsComponent implements OnInit, OnDestroy {
                 });
                 return false;
             }
+            const component = progress.componentInstance as ProgressDialogComponent;
+            if (!manifest.ipkUrl && item.localIpk) {
+                // a custom app with its .ipk next to the description file
+                await this.appManager.installByPath(device, item.localIpk,
+                    (progress, statusText) => component.update(statusText, progress));
+                this.storageInfo?.refresh();
+                return true;
+            }
             if (!manifest.ipkUrl) {
                 MessageDialogComponent.open(this.modalService, {
                     title: `Cannot install ${item.title}`,
-                    message: `The description file has no "ipkUrl". Install the .ipk file with the Install button instead.`,
+                    message: `No .ipk file was found next to the description file, and it has no "ipkUrl". ` +
+                        `Put the .ipk in the same folder, or use the Install button at the top to pick one.`,
                     positive: 'Close',
                 });
                 return false;
             }
-            const component = progress.componentInstance as ProgressDialogComponent;
             await this.appManager.installByManifest(device, manifest,
                 (progress, statusText) => component.update(statusText, progress));
             this.storageInfo?.refresh();

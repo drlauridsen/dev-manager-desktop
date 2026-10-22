@@ -91,6 +91,8 @@ export class RepositoryItem {
     fullDescriptionUrl?: string;
     /** Plain text shown on the details page, for apps that have no `fullDescriptionUrl`. */
     fullDescription?: string;
+    /** Path of an .ipk on this computer, for custom apps that are installed from a file. */
+    localIpk?: string;
 
     constructor(data: Partial<RepositoryItem>, url: string) {
         Object.assign(this, data);

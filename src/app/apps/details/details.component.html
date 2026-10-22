@@ -4,7 +4,12 @@
   </div>
   @let installed = installedInfo$ | async;
   <div class="d-flex flex-wrap flex-sm-row">
-    <img class="app-details-icon" [ngSrc]="item.detailIconUri ?? item.iconUri" width="160" height="160" alt="App icon"/>
+    @if ((item.detailIconUri ?? item.iconUri).startsWith('blob:')) {
+      <!--suppress AngularNgOptimizedImage -->
+      <img class="app-details-icon" [src]="(item.detailIconUri ?? item.iconUri) | trustUri" width="160" height="160" alt="App icon"/>
+    } @else {
+      <img class="app-details-icon" [ngSrc]="item.detailIconUri ?? item.iconUri" width="160" height="160" alt="App icon"/>
+    }
     <div class="flex-fill my-2 ms-3 d-flex flex-column">
       <h1>{{ item.title }}</h1>
       <label class="mt-1">

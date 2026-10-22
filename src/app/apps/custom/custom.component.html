@@ -27,7 +27,7 @@
       @for (item of result.items; track item.id) {
         <li class="list-group-item app-item d-flex flex-row align-items-center" (click)="parent.openDetails(item)">
           <div class="app-desc flex-fill">
-            <img class="app-icon" [src]="item.iconUri" [alt]="item.title" width="48" height="48">
+            <img class="app-icon" [src]="item.iconUri | trustUri" [alt]="item.title" width="48" height="48">
             <div class="app-headline ms-3">
               <div class="app-title">{{ item.title }}</div>
               <div class="app-description">
@@ -78,8 +78,15 @@
     <pre class="user-select-all">{{ dirPath }}</pre>
     <p>
       Use <strong>Open folder</strong> to open it, or <strong>Reload</strong> after you have changed a file.
-      Each app has its own file, named <code>&lt;app id&gt;.json</code>, for example <code>com.example.myapp.json</code>.
-      Files that do not end in <code>.json</code> are ignored.
+      The easiest way is one sub folder per app, with the three files next to each other:
+    </p>
+    <pre class="user-select-all">{{ dirName }}/com.example.myapp/com.example.myapp.json
+{{ dirName }}/com.example.myapp/com.example.myapp_1.0.0_all.ipk
+{{ dirName }}/com.example.myapp/icon.png</pre>
+    <p>
+      The .ipk is installed from the details page with <strong>Install</strong>, and the icon is shown in the list and on
+      the details page. You can also put the files directly in the folder, with no sub folder. Each .json file then needs its
+      own .ipk, whose name starts with the app id. To share an app, zip its sub folder and unzip it into the folder above.
     </p>
 
     <h6>What the file contains</h6>
@@ -92,11 +99,13 @@
         <tr><td><code>title</code></td><td>Yes</td><td>Name shown in the list.</td></tr>
         <tr><td><code>shortDescription</code></td><td>No</td><td>One line for the list.</td></tr>
         <tr><td><code>fullDescription</code></td><td>No</td><td>Text for the details page. A blank line starts a new paragraph.</td></tr>
-        <tr><td><code>iconUri</code></td><td>No</td><td>An <code>https://</code> link to a PNG. Local paths do not work.</td></tr>
+        <tr><td><code>icon</code></td><td>No</td><td>File name of a PNG in the same folder. Defaults to <code>&lt;app id&gt;.png</code>, <code>icon.png</code> or <code>largeIcon.png</code>.</td></tr>
+        <tr><td><code>ipk</code></td><td>No</td><td>File name of the .ipk in the same folder. Defaults to the .ipk that starts with the app id.</td></tr>
+        <tr><td><code>iconUri</code></td><td>No</td><td>An <code>https://</code> link to a PNG, used when there is no icon file.</td></tr>
         <tr><td><code>manifest.version</code></td><td>Yes</td><td>The version, for example <code>1.0.0</code>. Compared with the installed version to show updates.</td></tr>
         <tr><td><code>manifest.appDescription</code></td><td>No</td><td>Defaults to <code>shortDescription</code>.</td></tr>
         <tr><td><code>manifest.sourceUrl</code></td><td>No</td><td>An <code>https://</code> link shown as the project page.</td></tr>
-        <tr><td><code>manifest.ipkUrl</code></td><td>No</td><td>An <code>https://</code> link to the .ipk. Without it, install with the Install button.</td></tr>
+        <tr><td><code>manifest.ipkUrl</code></td><td>No</td><td>An <code>https://</code> link to the .ipk. Not needed when the .ipk is in the same folder.</td></tr>
       </tbody>
     </table>
     <p>
